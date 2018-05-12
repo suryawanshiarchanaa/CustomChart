@@ -10,6 +10,7 @@ Ext.define('CustomChartApp', {
             chartType: 'piechart',
             aggregationField: 'State',
             aggregationType: 'count',
+            bucketBy: '',
             stackField: '',
             query: ''
         }
@@ -174,7 +175,8 @@ Ext.define('CustomChartApp', {
                     calculationType: this.getSetting('aggregationType'),
                     field: this.getSetting('aggregationField'),
                     stackField: stackField,
-                    stackValues: stackValues
+                    stackValues: stackValues,
+                    bucketBy: chartType === 'piechart' ? null : this.getSetting('bucketBy')
                 }
             };
 

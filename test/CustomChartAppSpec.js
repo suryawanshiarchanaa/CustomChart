@@ -31,12 +31,13 @@ describe('CustomChartApp', function() {
             });
         });
 
-        pit('should ignore stacking for a pie chart', function() {
-            return renderChart({ settings: { chartType: 'piechart', stackField: 'Priority' } }).then(function(chart) {
+        pit('should ignore stacking, bucketing for a pie chart', function() {
+            return renderChart({ settings: { chartType: 'piechart', stackField: 'Priority', bucketBy: 'week' } }).then(function(chart) {
                 expect(chart.is('piechart')).toBe(true);
                 expect(chart.enableStacking).toBe(false);
                 expect(chart.calculator.stackField).not.toBeDefined();
                 expect(chart.calculator.stackValues).not.toBeDefined();
+                expect(chart.calculator.bucketBy).not.toBeDefined();
             });
         });
 
@@ -49,6 +50,19 @@ describe('CustomChartApp', function() {
         pit('should render a column chart', function() {
             return renderChart({ settings: { chartType: 'columnchart' } }).then(function(chart) {
                 expect(chart.is('columnchart')).toBe(true);
+            });
+        });
+
+        pit('should configure the calculator', function() {
+            return renderChart({ settings: {
+              chartType: 'barchart',
+              aggregationField: 'Priority',
+              aggregationType: 'estimate',
+              bucketBy: 'week'
+            } }).then(function(chart) {
+                expect(chart.calculator.field).toBe('Priority');
+                expect(chart.calculator.calculationType).toBe('estimate');
+                expect(chart.calculator.bucketBy).toBe('week');
             });
         });
 

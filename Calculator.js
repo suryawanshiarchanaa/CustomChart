@@ -4,7 +4,8 @@ Ext.define('Calculator', {
         calculationType: undefined,
         field: undefined,
         stackField: undefined,
-        stackValues: undefined
+        stackValues: undefined,
+        bucketBy: undefined
     },
 
     constructor: function(config) {
@@ -129,7 +130,17 @@ Ext.define('Calculator', {
 
     _getDisplayValue: function(field, value) {
         if (_.isDate(value)) {
-            return Rally.util.DateTime.formatWithDefault(value);
+            if (!this.bucketBy || this.bucketBy === 'day') {
+                return Rally.util.DateTime.formatWithDefault(value);
+            } else if (this.bucketBy === 'week') {
+                return Rally.util.DateTime.formatWithDefault(moment(value).startOf('week').toDate());
+            } else if (this.bucketBy === 'month') {
+                return moment(value).startOf('month').format('MMM \'YY');
+            } else if (this.bucketBy === 'quarter') {
+                return moment(value).startOf('quarter').format('YYYY [Q]Q');
+            } else if (this.bucketBy === 'year') {
+                return moment(value).startOf('year').format('YYYY');
+            }
         } else if (_.isObject(value)) {
             return value._refObjectName;
         } else if (Ext.isEmpty(value)) {
