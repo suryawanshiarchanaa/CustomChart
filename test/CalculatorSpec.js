@@ -122,13 +122,66 @@ describe('Calculator', function() {
             expect(chartData.categories).toEqual(['-- No Entry --', 'Building', 'Testing', 'Done']);
         });
 
-        it('should bucket by date field type', function() {
-            var calculator = Ext.create('Calculator', {
-                field: 'ClosedDate',
-                calculationType: 'estimate'
+        describe('when bucketing by date field type', function() {
+
+            it('should bucket by day by default', function() {
+                var calculator = Ext.create('Calculator', {
+                    field: 'ClosedDate',
+                    calculationType: 'estimate'
+                });
+                var chartData = calculator.prepareChartData(store);
+                expect(chartData.categories).toEqual(['-- No Entry --', '2017-01-02', '2017-02-03']);
             });
-            var chartData = calculator.prepareChartData(store);
-            expect(chartData.categories).toEqual(['-- No Entry --', '2017-01-02', '2017-02-03']);
+
+            it('should bucket by day', function() {
+                var calculator = Ext.create('Calculator', {
+                    field: 'ClosedDate',
+                    calculationType: 'estimate',
+                    bucketBy: 'day'
+                });
+                var chartData = calculator.prepareChartData(store);
+                expect(chartData.categories).toEqual(['-- No Entry --', '2017-01-02', '2017-02-03']);
+            });
+
+            it('should bucket by week', function() {
+                var calculator = Ext.create('Calculator', {
+                    field: 'ClosedDate',
+                    calculationType: 'estimate',
+                    bucketBy: 'week'
+                });
+                var chartData = calculator.prepareChartData(store);
+                expect(chartData.categories).toEqual([ '-- No Entry --', '2017-01-01', '2017-01-29' ]);
+            });
+
+            it('should bucket by month', function() {
+                var calculator = Ext.create('Calculator', {
+                    field: 'ClosedDate',
+                    calculationType: 'estimate',
+                    bucketBy: 'month'
+                });
+                var chartData = calculator.prepareChartData(store);
+                expect(chartData.categories).toEqual([ '-- No Entry --', 'Jan \'17', 'Feb \'17' ]);
+            });
+
+            it('should bucket by quarter', function() {
+                var calculator = Ext.create('Calculator', {
+                    field: 'ClosedDate',
+                    calculationType: 'estimate',
+                    bucketBy: 'quarter'
+                });
+                var chartData = calculator.prepareChartData(store);
+                expect(chartData.categories).toEqual([ '-- No Entry --', '2017 Q1' ]);
+            });
+
+            it('should bucket by year', function() {
+                var calculator = Ext.create('Calculator', {
+                    field: 'ClosedDate',
+                    calculationType: 'estimate',
+                    bucketBy: 'year'
+                });
+                var chartData = calculator.prepareChartData(store);
+                expect(chartData.categories).toEqual(['2017', '-- No Entry --' ]);
+            });
         });
 
         it('should aggregate by collection field', function() {

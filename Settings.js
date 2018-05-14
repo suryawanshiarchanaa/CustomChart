@@ -95,7 +95,13 @@ Ext.define('Settings', {
                         }
                     }
                 },
+                bubbleEvents: ['fieldselected'],
                 listeners: {
+                    change: function (combo) {
+                        if (combo.getRecord()) {
+                            combo.fireEvent('fieldselected', combo.getRecord().get('fieldDefinition'));
+                        }
+                    },
                     ready: function (combo) {
                         combo.store.filterBy(function (record) {
                             var field = record.get('fieldDefinition'),
@@ -111,6 +117,50 @@ Ext.define('Settings', {
                         if (!Ext.Array.contains(fields, combo.getValue())) {
                             combo.setValue(fields[0]);
                         }
+
+                        if (combo.getRecord()) {
+                            combo.fireEvent('fieldselected', combo.getRecord().get('fieldDefinition'));
+                        }
+                    }
+                }
+            },
+            {
+                name: 'bucketBy',
+                xtype: 'rallycombobox',
+                plugins: ['rallyfieldvalidationui'],
+                fieldLabel: 'Bucket By',
+                displayField: 'name',
+                valueField: 'value',
+                editable: false,
+                allowBlank: false,
+                store: {
+                    fields: ['name', 'value'],
+                    data: [
+                        { name: 'Day', value: 'day' },
+                        { name: 'Week', value: 'week' },
+                        { name: 'Month', value: 'month' },
+                        { name: 'Quarter', value: 'quarter' },
+                        // { name: 'Release', value: 'release' },
+                        { name: 'Year', value: 'year' }
+                    ]
+                },
+                lastQuery: '',
+                hidden: true,
+                toggleVisibility: function() {
+                    if (this.selectedFieldType === 'date' && this.selectedChartType !== 'piechart') {
+                        this.show();
+                      } else {
+                        this.hide();
+                    }
+                },
+                handlesEvents: {
+                    fieldselected: function(field) {
+                        this.selectedFieldType = field.getType();
+                        this.toggleVisibility();
+                    },
+                    chartselected: function (type) {
+                        this.selectedChartType = type;
+                        this.toggleVisibility();
                     }
                 }
             },

@@ -40,7 +40,8 @@
         calculationType: undefined,
         field: undefined,
         stackField: undefined,
-        stackValues: undefined
+        stackValues: undefined,
+        bucketBy: undefined
     },
 
     constructor: function(config) {
@@ -165,7 +166,17 @@
 
     _getDisplayValue: function(field, value) {
         if (_.isDate(value)) {
-            return Rally.util.DateTime.formatWithDefault(value);
+            if (!this.bucketBy || this.bucketBy === 'day') {
+                return Rally.util.DateTime.formatWithDefault(value);
+            } else if (this.bucketBy === 'week') {
+                return Rally.util.DateTime.formatWithDefault(moment(value).startOf('week').toDate());
+            } else if (this.bucketBy === 'month') {
+                return moment(value).startOf('month').format('MMM \'YY');
+            } else if (this.bucketBy === 'quarter') {
+                return moment(value).startOf('quarter').format('YYYY [Q]Q');
+            } else if (this.bucketBy === 'year') {
+                return moment(value).startOf('year').format('YYYY');
+            }
         } else if (_.isObject(value)) {
             return value._refObjectName;
         } else if (Ext.isEmpty(value)) {
@@ -337,7 +348,7 @@
             title: {text: ''},
             tooltip: {
                 headerFormat: '',
-                pointFormat: '<b>{point.name}</b>: <b>{point.y}</b> ({point.percentage:.1f}%)'
+                pointFormat: '{point.name}: <b>{point.percentage:.1f}%</b>'
             },
             plotOptions: {
                 pie: {
@@ -345,7 +356,7 @@
                     cursor: 'pointer',
                     dataLabels: {
                         enabled: true,
-                        format: '<b>{point.name}</b>: <b> {point.y}</b> ({point.percentage:.1f} %)',
+                        format: '<b>{point.name}</b>: {point.percentage:.1f} %',
                         style: {
                             color: 'black'
                         }
@@ -460,7 +471,13 @@
                         }
                     }
                 },
+                bubbleEvents: ['fieldselected'],
                 listeners: {
+                    change: function (combo) {
+                        if (combo.getRecord()) {
+                            combo.fireEvent('fieldselected', combo.getRecord().get('fieldDefinition'));
+                        }
+                    },
                     ready: function (combo) {
                         combo.store.filterBy(function (record) {
                             var field = record.get('fieldDefinition'),
@@ -476,6 +493,50 @@
                         if (!Ext.Array.contains(fields, combo.getValue())) {
                             combo.setValue(fields[0]);
                         }
+
+                        if (combo.getRecord()) {
+                            combo.fireEvent('fieldselected', combo.getRecord().get('fieldDefinition'));
+                        }
+                    }
+                }
+            },
+            {
+                name: 'bucketBy',
+                xtype: 'rallycombobox',
+                plugins: ['rallyfieldvalidationui'],
+                fieldLabel: 'Bucket By',
+                displayField: 'name',
+                valueField: 'value',
+                editable: false,
+                allowBlank: false,
+                store: {
+                    fields: ['name', 'value'],
+                    data: [
+                        { name: 'Day', value: 'day' },
+                        { name: 'Week', value: 'week' },
+                        { name: 'Month', value: 'month' },
+                        { name: 'Quarter', value: 'quarter' },
+                        // { name: 'Release', value: 'release' },
+                        { name: 'Year', value: 'year' }
+                    ]
+                },
+                lastQuery: '',
+                hidden: true,
+                toggleVisibility: function() {
+                    if (this.selectedFieldType === 'date' && this.selectedChartType !== 'piechart') {
+                        this.show();
+                      } else {
+                        this.hide();
+                    }
+                },
+                handlesEvents: {
+                    fieldselected: function(field) {
+                        this.selectedFieldType = field.getType();
+                        this.toggleVisibility();
+                    },
+                    chartselected: function (type) {
+                        this.selectedChartType = type;
+                        this.toggleVisibility();
                     }
                 }
             },
@@ -594,6 +655,7 @@
             chartType: 'piechart',
             aggregationField: 'State',
             aggregationType: 'count',
+            bucketBy: '',
             stackField: '',
             query: ''
         }
@@ -758,7 +820,8 @@
                     calculationType: this.getSetting('aggregationType'),
                     field: this.getSetting('aggregationField'),
                     stackField: stackField,
-                    stackValues: stackValues
+                    stackValues: stackValues,
+                    bucketBy: chartType === 'piechart' ? null : this.getSetting('bucketBy')
                 }
             };
 
@@ -838,7 +901,8 @@
 
             Rally.launchApp('CustomChartApp', {
                 name:"Custom Chart",
-	            parentRepos:""
+                parentRepos:"",
+                version:"1.2.1"
             });
 
         });
