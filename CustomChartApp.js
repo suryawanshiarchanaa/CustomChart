@@ -230,7 +230,7 @@ Ext.define('CustomChartApp', {
             field = model.getField(this.getSetting('aggregationField')),
             sorters = [];
 
-        if (field && field.getType() !== 'collection') {
+        if (field && field.getType() !== 'collection' && field.sortable) {
             sorters.push({
                 property: this.getSetting('aggregationField'),
                 direction: 'ASC'
