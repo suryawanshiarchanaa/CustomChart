@@ -875,7 +875,7 @@
             field = model.getField(this.getSetting('aggregationField')),
             sorters = [];
 
-        if (field && field.getType() !== 'collection') {
+        if (field && field.getType() !== 'collection' && field.sortable) {
             sorters.push({
                 property: this.getSetting('aggregationField'),
                 direction: 'ASC'
@@ -902,7 +902,7 @@
             Rally.launchApp('CustomChartApp', {
                 name:"Custom Chart",
                 parentRepos:"",
-                version:"1.2.1"
+                version:"1.2.2"
             });
 
         });
