@@ -244,7 +244,8 @@ Ext.define('CustomChartApp', {
         var queries = [],
             timeboxScope = this.getContext().getTimeboxScope();
         if (this.getSetting('query')) {
-            queries.push(Rally.data.QueryFilter.fromQueryString(this.getSetting('query')));
+            var querySetting = this.getSetting('query').replace(/\{user\}/g, this.getContext().getUser()._ref);
+            queries.push(Rally.data.QueryFilter.fromQueryString(querySetting));
         }
         if (timeboxScope && _.any(this.models, timeboxScope.isApplicable, timeboxScope)) {
             queries.push(timeboxScope.getQueryFilter());

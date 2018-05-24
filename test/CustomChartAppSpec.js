@@ -121,6 +121,14 @@ describe('CustomChartApp', function() {
             });
         });
 
+        pit('should replace the {user} token in a query if specified', function() {
+            return renderChart({ settings: { query: '((Owner = "{user}") OR (SubmittedBy = "{user}"))' } }).then(function(chart) {
+                var filters = app.down('rallygridboard').storeConfig.filters;
+                expect(filters.length).toBe(1);
+                expect(filters[0].toString()).toBe('((Owner = "/user/123") OR (SubmittedBy = "/user/123"))');
+            });
+        });
+
         pit('should include a timeboxscope if available', function() {
             var iteration = Rally.test.Mock.dataFactory.getRecord('iteration');
             var timeboxScope = Ext.create('Rally.app.TimeboxScope', { record: iteration });
