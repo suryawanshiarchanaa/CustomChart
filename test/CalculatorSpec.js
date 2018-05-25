@@ -76,7 +76,7 @@ describe('Calculator', function() {
                 values: [
                     { Priority: 'P1', PlanEstimate: 2, Owner: null, c_KanbanState: '', Tags: { _tagsNameArray: [] }, ClosedDate: null },
                     { Priority: 'P2', PlanEstimate: 3, Owner: { _refObjectName: 'User1' }, c_KanbanState: 'Building', Tags: { _tagsNameArray: [{ Name: 'Foo' }, { Name: 'Bar' }] }, ClosedDate: '2017-01-02T12:00:00Z' },
-                    { Priority: 'P3', PlanEstimate: 4, Owner: { _refObjectName: 'User2' }, c_KanbanState: 'Testing', Tags: { _tagsNameArray: [{ Name: 'Bar' }, { Name: 'Baz' }] }, ClosedDate: '2017-02-03T12:00:00Z' },
+                    { Priority: 'P3', PlanEstimate: 4, Owner: { _refObjectName: 'User2' }, c_KanbanState: 'Testing', Tags: { _tagsNameArray: [{ Name: 'Bar' }, { Name: 'Baz' }] }, ClosedDate: '2017-01-04T12:00:00Z' },
                     { Priority: 'P4', PlanEstimate: 5, Owner: { _refObjectName: 'User3' }, c_KanbanState: 'Done',  Tags: { _tagsNameArray: [{ Name: 'Baz' }] }, ClosedDate: null }
                 ]
             });
@@ -130,7 +130,7 @@ describe('Calculator', function() {
                     calculationType: 'estimate'
                 });
                 var chartData = calculator.prepareChartData(store);
-                expect(chartData.categories).toEqual(['-- No Entry --', '2017-01-02', '2017-02-03']);
+                expect(chartData.categories).toEqual(['-- No Entry --', '2017-01-02', '2017-01-03', '2017-01-04']);
             });
 
             it('should bucket by day', function() {
@@ -140,7 +140,7 @@ describe('Calculator', function() {
                     bucketBy: 'day'
                 });
                 var chartData = calculator.prepareChartData(store);
-                expect(chartData.categories).toEqual(['-- No Entry --', '2017-01-02', '2017-02-03']);
+                expect(chartData.categories).toEqual(['-- No Entry --', '2017-01-02', '2017-01-03', '2017-01-04']);
             });
 
             it('should bucket by week', function() {
@@ -150,7 +150,7 @@ describe('Calculator', function() {
                     bucketBy: 'week'
                 });
                 var chartData = calculator.prepareChartData(store);
-                expect(chartData.categories).toEqual([ '-- No Entry --', '2017-01-01', '2017-01-29' ]);
+                expect(chartData.categories).toEqual([ '-- No Entry --', '2017-01-01' ]);
             });
 
             it('should bucket by month', function() {
@@ -160,7 +160,7 @@ describe('Calculator', function() {
                     bucketBy: 'month'
                 });
                 var chartData = calculator.prepareChartData(store);
-                expect(chartData.categories).toEqual([ '-- No Entry --', 'Jan \'17', 'Feb \'17' ]);
+                expect(chartData.categories).toEqual([ '-- No Entry --', 'Jan \'17' ]);
             });
 
             it('should bucket by quarter', function() {

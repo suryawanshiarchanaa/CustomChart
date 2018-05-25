@@ -98,8 +98,10 @@ Ext.define('Calculator', {
     },
 
     _groupData: function(store) {
-        if (store.model.getField(this.field).getType() === 'collection') {
-            var groups = {};
+        var field = store.model.getField(this.field),
+            fieldType = field.getType(),
+            groups = {};
+        if (fieldType === 'collection') {
             _.each(store.getRange(), function(record) {
                 var value = record.get(this.field),
                     values = value._tagsNameArray;
@@ -115,10 +117,50 @@ Ext.define('Calculator', {
             }, this);
             return groups;
         } else {
-            return _.groupBy(store.getRange(), function(record) {
+            groups = _.groupBy(store.getRange(), function(record) {
                 return this._getDisplayValueForField(record, this.field);
             }, this);
+            if (fieldType === 'date') {
+                var dates = _.sortBy(_.compact(_.map(store.getRange(), function(record) { 
+                    return record.get(this.field); 
+                }, this)));
+                var datesNoGaps = this._getDateRange(dates[0], dates[dates.length-1]);
+                var allGroups = {};
+                if (groups['-- No Entry --']) {
+                    allGroups['-- No Entry --'] = groups['-- No Entry --'];
+                }
+                groups = _.reduce(datesNoGaps, function(accum, val) {
+                    var group = this._getDisplayValue(field, moment(val).toDate()); 
+                    accum[group] = groups[group] || [];
+                    return accum;
+                }, allGroups, this);
+            }
+
+            return groups;
         }
+    },
+
+    _getDateRange: function(startDate, endDate) {
+        var currentDate = startDate;
+        var datesNoGaps = [];
+        var unit = 'd';
+        if (this.bucketBy === 'week') {
+            unit = 'w';
+        } else if(this.bucketBy === 'month') {
+            unit = 'M';
+        } else if(this.bucketBy === 'quarter') {
+            unit = 'Q';
+        } else if(this.bucketBy === 'year') {
+            unit = 'y';
+        }
+
+        while(currentDate <= endDate) {
+            datesNoGaps.push(currentDate);
+            currentDate = moment(currentDate).add(1, unit).toDate();
+        }
+
+        datesNoGaps.push(endDate);
+        return datesNoGaps;
     },
 
     _getDisplayValueForField: function(record, fieldName) {
