@@ -16,7 +16,7 @@ Ext.define('PieChart', {
             title: {text: ''},
             tooltip: {
                 headerFormat: '',
-                pointFormat: '{point.name}: <b>{point.percentage:.1f}%</b>'
+                pointFormat: '<b>{point.name}:</b> {point.percentage:.1f}% ({point.y}/{point.total})'
             },
             plotOptions: {
                 pie: {
@@ -24,7 +24,7 @@ Ext.define('PieChart', {
                     cursor: 'pointer',
                     dataLabels: {
                         enabled: true,
-                        format: '<b>{point.name}</b>: {point.percentage:.1f} %',
+                        format: '<b>{point.name}:</b> {point.percentage:.1f}% ({point.y}/{point.total})',
                         style: {
                             color: 'black'
                         }
