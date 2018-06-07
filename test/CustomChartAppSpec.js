@@ -22,6 +22,9 @@ describe('CustomChartApp', function() {
             .respondWith(["", "P1", "P2", "P3", "P4"]);
         var defects = Rally.test.Mock.dataFactory.getData('defect', { count: 10 });
         query = Rally.test.Mock.ajax.whenQuerying('artifact').respondWith(defects);
+
+        var testcases = Rally.test.Mock.dataFactory.getData('testcase', { count: 10 });
+        query = Rally.test.Mock.ajax.whenQuerying('artifact').respondWith(defects);
     });
 
     describe('configuration', function() {
@@ -213,6 +216,26 @@ describe('CustomChartApp', function() {
         pit('should load all the data', function() {
             return renderChart().then(function(chart) {
                 expect(app.down('rallygridboard').chartConfig.storeConfig.limit).toBe(Infinity);
+            });
+        });
+
+        describe('filtering', function() {
+            pit('should include default filters for artifacts', function() {
+                return renderChart().then(function(chart) {
+                    var filterPlugin = app.down('rallygridboard').plugins[0],
+                        quickFilterPanelConfig = filterPlugin.inlineFilterButtonConfig.inlineFilterPanelConfig.quickFilterPanelConfig;
+                    expect(quickFilterPanelConfig.defaultFields).toEqual(['Owner', 'State', 'ScheduleState']);
+                });
+            });
+
+            pit('should not include invalid default filters', function() {
+                var testcases = Rally.test.Mock.dataFactory.getData('testcase', { count: 10 });
+                Rally.test.Mock.ajax.whenQuerying('artifact').respondWith(testcases);
+                return renderChart({ settings: { types: 'testcase', aggregationField: 'Type' } }).then(function(chart) {
+                    var filterPlugin = app.down('rallygridboard').plugins[0],
+                        quickFilterPanelConfig = filterPlugin.inlineFilterButtonConfig.inlineFilterPanelConfig.quickFilterPanelConfig;
+                    expect(quickFilterPanelConfig.defaultFields).toEqual(['Owner']);
+                });
             });
         });
     });
