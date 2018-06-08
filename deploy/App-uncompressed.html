@@ -801,23 +801,15 @@
     },
 
     _getQuickFilters: function() {
-        var quickFilters = [],
-          types = this._getTypesSetting(),
-          type = types[0];
-        if (types.length > 1) {
+        var quickFilters = ['Owner', 'State', 'ScheduleState'],
+            model = this.models[0];
+        if (this.models.length > 1) {
             quickFilters.push('ModelType');
         }
 
-        if (Rally.data.ModelTypes.isArtifact(type)) {
-            quickFilters.push('Owner');
-            if (Rally.data.ModelTypes.isPortfolioItem(type) || type.toLowerCase() === 'task') {
-                quickFilters.push('State');
-            } else {
-                quickFilters.push('ScheduleState');
-            }
-        }
-
-        return quickFilters;
+        return _.filter(quickFilters, function(quickFilter) {
+            return model.hasField(quickFilter);
+        });
     },
 
     _getTypesSetting: function() {
@@ -945,7 +937,7 @@
             Rally.launchApp('CustomChartApp', {
                 name:"Custom Chart",
                 parentRepos:"",
-                version:"1.2.5"
+                version:"1.2.6"
             });
 
         });
