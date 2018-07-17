@@ -724,7 +724,8 @@
       var hasAllowedValues = stackingField && stackingField.hasAllowedValues(), 
           shouldLoadAllowedValues = hasAllowedValues && (
             _.contains(['state', 'rating', 'string'], stackingField.getType()) ||
-            stackingField.getAllowedValueType() === 'state'
+            stackingField.getAllowedValueType() === 'state' ||
+            stackingField.getAllowedValueType() === 'flowstate'
           );
       return shouldLoadAllowedValues;
     },
@@ -946,7 +947,7 @@
             Rally.launchApp('CustomChartApp', {
                 name:"Custom Chart",
                 parentRepos:"",
-                version:"1.2.7"
+                version:"1.2.8"
             });
 
         });

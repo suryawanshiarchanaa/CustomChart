@@ -37,7 +37,8 @@ Ext.define('CustomChartApp', {
       var hasAllowedValues = stackingField && stackingField.hasAllowedValues(), 
           shouldLoadAllowedValues = hasAllowedValues && (
             _.contains(['state', 'rating', 'string'], stackingField.getType()) ||
-            stackingField.getAllowedValueType() === 'state'
+            stackingField.getAllowedValueType() === 'state' ||
+            stackingField.getAllowedValueType() === 'flowstate'
           );
       return shouldLoadAllowedValues;
     },
