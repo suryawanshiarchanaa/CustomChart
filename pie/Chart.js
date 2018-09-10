@@ -39,5 +39,9 @@ Ext.define('PieChart', {
         config = config || {};
         this.mergeConfig(config);
         this.callParent([this.config]);
+    },
+
+    _isData: function(point) {
+        return point > 0 || !!(point && point.y);
     }
 });

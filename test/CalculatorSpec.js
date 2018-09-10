@@ -1,7 +1,7 @@
 describe('Calculator', function() {
 
     describe('with tasks', function() {
-        
+
         var data, store;
 
         function expectChartDataToBe(chartData, expectedSeriesData) {
@@ -418,6 +418,86 @@ describe('Calculator', function() {
                 { name: 'Release 2', type: 'column', data: [ 0, 0, 0, 5 ] },
                 { name: 'Release 3', type: 'column', data: [ 0, 3, 0, 6 ] }
             ]);
+        });
+    });
+
+    describe('when charting by display color', function() {
+
+        var data, store;
+
+        beforeEach(function() {
+            var model = Rally.test.Mock.dataFactory.getModel('defect');
+            data = Rally.test.Mock.dataFactory.getRecords('defect', {
+                count: 5,
+                values: [
+                    { DisplayColor: '', Severity: 'S1', PlanEstimate: 2 },
+                    { DisplayColor: '#105CAB', Severity: 'S2', PlanEstimate: 3 },
+                    { DisplayColor: '#F9A814', Severity: 'S3', PlanEstimate: 4 },
+                    { DisplayColor: '#DF1A7B', Severity: '', PlanEstimate: 5 },
+                    { DisplayColor: '#DF1A7B', Severity: '', PlanEstimate: 6 }
+                ]
+            });
+            store = Ext.create('Rally.data.wsapi.Store', {
+                model: model,
+                data: data
+            });
+        });
+
+        describe('when field is display color', function() {
+            describe('when there is no stacking', function() {
+                it('should translate colors from hex to names', function() {
+                    var calculator = Ext.create('ColumnCalculator', {
+                        field: 'DisplayColor',
+                        calculationType: 'estimate'
+                    });
+                    var chartData = calculator.prepareChartData(store);
+                    expect(chartData.categories).toEqual(['-- No Entry --', 'Dark Blue', 'Orange', 'Pink']);
+                    expect(chartData.series).toEqual([{
+                        name: 'DisplayColor',
+                        type: 'column',
+                        data: [
+                            { name: '-- No Entry --', y: 2 },
+                            { name: 'Dark Blue', y: 3, color: '#105CAB' },
+                            { name: 'Orange', y: 4, color: '#F9A814' },
+                            { name: 'Pink', y: 11, color: '#DF1A7B' }
+                        ]
+                    }]);
+                });
+            });
+            describe('when there is stacking', function() {
+                it('should translate colors from hex to names', function() {
+                    var calculator = Ext.create('ColumnCalculator', {
+                        field: 'DisplayColor',
+                        stackField: 'Severity',
+                        calculationType: 'estimate'
+                    });
+                    var chartData = calculator.prepareChartData(store);
+                    expect(chartData.categories).toEqual(['-- No Entry --', 'Dark Blue', 'Orange', 'Pink']);
+                    expect(chartData.series).toEqual([
+                        { name: 'S1', type: 'column', data: [2, 0, 0, 0]},
+                        { name: 'S2', type: 'column', data: [0, 3, 0, 0]},
+                        { name: 'S3', type: 'column', data: [0, 0, 4, 0]},
+                        { name: 'None', type: 'column', data: [0, 0, 0, 11]},
+                    ]);
+                });
+            });
+        });
+        describe('when stack field is display color', function() {
+            it('should translate colors from hex to names', function() {
+                var calculator = Ext.create('ColumnCalculator', {
+                    field: 'Severity',
+                    stackField: 'DisplayColor',
+                    calculationType: 'estimate'
+                });
+                var chartData = calculator.prepareChartData(store);
+                expect(chartData.categories).toEqual(['S1', 'S2', 'S3', 'None']);
+                expect(chartData.series).toEqual([
+                    { name: '-- No Entry --', type: 'column', data: [2, 0, 0, 0]},
+                    { name: 'Dark Blue', type: 'column', data: [0, 3, 0, 0], color: '#105CAB' },
+                    { name: 'Orange', type: 'column', data: [0, 0, 4, 0], color: '#F9A814' },
+                    { name: 'Pink', type: 'column', data: [0, 0, 0, 11], color: '#DF1A7B' }
+                ]);
+            });
         });
     });
 });

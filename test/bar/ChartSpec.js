@@ -38,4 +38,34 @@ describe('BarChart', function() {
             });
         });
     });
+
+    describe('#_isData', function() {
+        beforeEach(function() {
+            chart = Ext.create('BarChart', {
+                enableStacking: true,
+                chartData: {},
+                loadMask: false
+            });
+        });
+
+        it('should return true for a value', function() {
+            expect(chart._isData(5)).toBe(true);
+        });
+
+        it('should return true for a nested value', function() {
+            expect(chart._isData({ y: 5 })).toBe(true);
+        });
+
+        it('should return false for an empty value', function() {
+            expect(chart._isData()).toBe(false);
+        });
+
+        it('should return false for a 0 value', function() {
+            expect(chart._isData(0)).toBe(false);
+        });
+
+        it('should return false for a nested 0 value', function() {
+            expect(chart._isData({ y: 0 })).toBe(false);
+        });
+    });
 });
