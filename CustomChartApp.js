@@ -6,9 +6,9 @@ Ext.define('CustomChartApp', {
 
     config: {
         defaultSettings: {
-            types: 'Test cases',
+            types: 'Defect',
             chartType: 'piechart',
-            aggregationField: 'Method',
+            aggregationField: 'State',
             aggregationType: 'count',
             bucketBy: '',
             stackField: '',
